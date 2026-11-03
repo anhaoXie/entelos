@@ -44,7 +44,7 @@ Applications supply source authority, independent expectations, admission/learni
 
 ## Lifecycle request records
 
-The CLI accepts one object per call: `op` plus that operation's fields. The host installs the roles in the context file, so a request never names its own role. Every write operation also requires `expected_revision` and `request_key`; read operations reject them. An unknown field is `invalid_request`.
+The CLI reads one JSON object per line, in a loop, so one process can take many requests. Each object has `op` plus that operation's fields. The host installs the roles in the context file, so a request never names its own role. Every write operation also requires `expected_revision` and `request_key`; read operations reject them. An unknown field is `invalid_request`.
 
 | Operation | Host role | Accepted fields |
 |---|---|---|
@@ -89,4 +89,4 @@ A content reference is `sha256:` plus the lowercase hex SHA-256 of `media type +
 | `rule.cel` | `text/plain` |
 | `fixed.json` | `application/json` |
 
-To change a fixed value for a stage, replace the fixed bytes, compute the new reference with the `application/json` media type, write it into the manifest's `fixed_ref`, encode the manifest as canonical JSON (sorted keys, UTF-8, no insignificant whitespace, trailing newline), and compute the manifest reference with the bundle manifest media type. The manifest's `environment_ref` and `source_ref` follow the same rule when their bytes change. The runtime reports the bundle identity in `describe`; the lifecycle records it as the snapshot's `bundle_ref` and `engine_build`.
+To change a fixed value for a stage, replace the fixed bytes, compute the new reference with the `application/json` media type, write it into the manifest's `fixed_ref`, encode the manifest, and compute the manifest reference over the exact manifest bytes with the bundle manifest media type. The examples use the canonical `encode()` from `git_store.py` (sorted keys, UTF-8, no insignificant whitespace, trailing newline), but the host does not require that form and any byte change gives a new reference. The manifest's `environment_ref` and `source_ref` follow the same rule when their bytes change. `describe` reports the assembled bundle identity as `bundle_ref` and the host build as `implementation_ref`; the lifecycle stores them as the snapshot's `bundle_ref` and `engine_build`.
